@@ -1,0 +1,16 @@
+<idea-plugin>
+    <id>com.teemo.plugins</id>
+    <name>Plugins From Teemo</name>
+    <vendor email="1440492700@qq.com" url="">1440492700@qq.com</vendor>
+    <description><![CDATA[auto set file highlighting inspections level to SYNTAX]]></description>
+    <depends>com.intellij.modules.platform</depends>
+    <extensions defaultExtensionNs="com.intellij"></extensions>
+    <project-components>
+        <component>
+            <implementation-class>com.teemo.plugins.MyFileEditorListener</implementation-class>
+        </component>
+    </project-components>
+    <applicationListeners>
+        <listener class="com.teemo.plugins.MyFileEditorListener" topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+    </applicationListeners>
+</idea-plugin>
