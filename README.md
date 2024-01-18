@@ -1,1 +1,1 @@
-# Plugins-From-Teemo
+# IDEA-Plugins-From-Teemo
