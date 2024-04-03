@@ -2,12 +2,16 @@
     <id>com.teemo.plugins</id>
     <name>Plugins From Teemo</name>
     <vendor email="1440492700@qq.com" url="">1440492700@qq.com</vendor>
-    <description><![CDATA[auto set file highlighting inspections level to SYNTAX]]></description>
+    <description><![CDATA[auto set file highlighting inspections level to NONE/SYNTAX/ALL]]></description>
     <depends>com.intellij.modules.platform</depends>
-    <extensions defaultExtensionNs="com.intellij"></extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- parentId="tools" -->
+        <applicationConfigurable instance="com.teemo.plugins.MyPluginConfigurable" id="com.teemo.plugins.MyPluginConfigurable" displayName="Plugins From Teemo"></applicationConfigurable>
+    </extensions>
     <project-components>
         <component>
             <implementation-class>com.teemo.plugins.MyFileEditorListener</implementation-class>
+            <implementation-class>com.teemo.plugins.MyPluginConfigurable</implementation-class>
         </component>
     </project-components>
     <applicationListeners>

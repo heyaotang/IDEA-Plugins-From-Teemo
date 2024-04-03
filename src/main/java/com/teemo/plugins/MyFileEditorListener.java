@@ -2,6 +2,7 @@ package com.teemo.plugins;
 
 import com.intellij.codeInsight.daemon.impl.analysis.FileHighlightingSetting;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightingSettingsPerFile;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.markup.InspectionsLevel;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -11,22 +12,36 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
 
-/** auto set file highlighting inspections level to SYNTAX */
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
 public class MyFileEditorListener implements FileEditorManagerListener {
 
-    private static final String[] FILE_EXTENSIONS = {".java", ".ts", ".tsx", ".css", ".scss", ".less", ".html"};
     private static final Logger LOG = Logger.getInstance(MyFileEditorListener.class);
+    private final PropertiesComponent properties = PropertiesComponent.getInstance();
 
     @Override
     public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
         LOG.info("File opened: " + file.getPath());
-        for (String extension : FILE_EXTENSIONS) {
-            if (file.getName().endsWith(extension)) {
+        var endFlags = Arrays.stream(properties.getValue(MyPluginConfigurable.NAME_HighlightingSettings1, "").split(",")).map(x -> x.toUpperCase(Locale.ROOT).trim()).collect(Collectors.toList());
+        for (String endFlag : endFlags) {
+            if (file.getName().toUpperCase(Locale.ROOT).endsWith(endFlag)) {
                 FileEditorManagerListener.super.fileOpened(source, file);
                 PsiFile psiFile = PsiManager.getInstance(source.getProject()).findFile(file);
                 if (psiFile != null) {
                     HighlightingSettingsPerFile highlightingSettingsPerFile = HighlightingSettingsPerFile.getInstance(source.getProject());
-                    highlightingSettingsPerFile.setHighlightingSettingForRoot(psiFile, FileHighlightingSetting.fromInspectionsLevel(InspectionsLevel.SYNTAX));
+                    String level = properties.getValue(MyPluginConfigurable.NAME_HighlightingSettings2, "").toUpperCase(Locale.ROOT).trim();
+                    if ("NOACTION".equals(level)) {
+
+                    } else if ("NONE".equals(level)) {
+                        highlightingSettingsPerFile.setHighlightingSettingForRoot(psiFile, FileHighlightingSetting.fromInspectionsLevel(InspectionsLevel.NONE));
+                    } else if ("SYNTAX".equals(level)) {
+                        highlightingSettingsPerFile.setHighlightingSettingForRoot(psiFile, FileHighlightingSetting.fromInspectionsLevel(InspectionsLevel.SYNTAX));
+                    }
+                    if ("ALL".equals(level)) {
+                        highlightingSettingsPerFile.setHighlightingSettingForRoot(psiFile, FileHighlightingSetting.fromInspectionsLevel(InspectionsLevel.ALL));
+                    }
                 }
                 break;
             }
