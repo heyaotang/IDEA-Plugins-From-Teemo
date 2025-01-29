@@ -24,26 +24,43 @@ public class MyFileEditorListener implements FileEditorManagerListener {
     @Override
     public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
         LOG.info("File opened: " + file.getPath());
-        var endFlags = Arrays.stream(properties.getValue(MyPluginConfigurable.NAME_HighlightingSettings1, "").split(",")).map(x -> x.toUpperCase(Locale.ROOT).trim()).collect(Collectors.toList());
-        for (String endFlag : endFlags) {
-            if (file.getName().toUpperCase(Locale.ROOT).endsWith(endFlag)) {
+        var allFlags = Arrays.stream(this.properties.getValue(MyPluginConfigurable.NAME_HIGHLIGHT_ALL, "").split(",")).map(x -> x.toUpperCase(Locale.ROOT).trim()).collect(Collectors.toList());
+        var syntaxFlags = Arrays.stream(this.properties.getValue(MyPluginConfigurable.NAME_HIGHLIGHT_SYNTAX, "").split(",")).map(x -> x.toUpperCase(Locale.ROOT).trim()).collect(Collectors.toList());
+        var noneFlags = Arrays.stream(this.properties.getValue(MyPluginConfigurable.NAME_HIGHLIGHT_NONE, "").split(",")).map(x -> x.toUpperCase(Locale.ROOT).trim()).collect(Collectors.toList());
+        //
+        for (String allFlag : allFlags) {
+            if (file.getName().toUpperCase(Locale.ROOT).endsWith(allFlag)) {
                 FileEditorManagerListener.super.fileOpened(source, file);
                 PsiFile psiFile = PsiManager.getInstance(source.getProject()).findFile(file);
                 if (psiFile != null) {
                     HighlightingSettingsPerFile highlightingSettingsPerFile = HighlightingSettingsPerFile.getInstance(source.getProject());
-                    String level = properties.getValue(MyPluginConfigurable.NAME_HighlightingSettings2, "").toUpperCase(Locale.ROOT).trim();
-                    if ("NOACTION".equals(level)) {
-
-                    } else if ("NONE".equals(level)) {
-                        highlightingSettingsPerFile.setHighlightingSettingForRoot(psiFile, FileHighlightingSetting.fromInspectionsLevel(InspectionsLevel.NONE));
-                    } else if ("SYNTAX".equals(level)) {
-                        highlightingSettingsPerFile.setHighlightingSettingForRoot(psiFile, FileHighlightingSetting.fromInspectionsLevel(InspectionsLevel.SYNTAX));
-                    }
-                    if ("ALL".equals(level)) {
-                        highlightingSettingsPerFile.setHighlightingSettingForRoot(psiFile, FileHighlightingSetting.fromInspectionsLevel(InspectionsLevel.ALL));
-                    }
+                    highlightingSettingsPerFile.setHighlightingSettingForRoot(psiFile, FileHighlightingSetting.fromInspectionsLevel(InspectionsLevel.ALL));
                 }
-                break;
+                return;
+            }
+        }
+        //
+        for (String syntaxFlag : syntaxFlags) {
+            if (file.getName().toUpperCase(Locale.ROOT).endsWith(syntaxFlag)) {
+                FileEditorManagerListener.super.fileOpened(source, file);
+                PsiFile psiFile = PsiManager.getInstance(source.getProject()).findFile(file);
+                if (psiFile != null) {
+                    HighlightingSettingsPerFile highlightingSettingsPerFile = HighlightingSettingsPerFile.getInstance(source.getProject());
+                    highlightingSettingsPerFile.setHighlightingSettingForRoot(psiFile, FileHighlightingSetting.fromInspectionsLevel(InspectionsLevel.SYNTAX));
+                }
+                return;
+            }
+        }
+        //
+        for (String noneFlag : noneFlags) {
+            if (file.getName().toUpperCase(Locale.ROOT).endsWith(noneFlag) || file.getName().toUpperCase(Locale.ROOT).matches(noneFlag)) {
+                FileEditorManagerListener.super.fileOpened(source, file);
+                PsiFile psiFile = PsiManager.getInstance(source.getProject()).findFile(file);
+                if (psiFile != null) {
+                    HighlightingSettingsPerFile highlightingSettingsPerFile = HighlightingSettingsPerFile.getInstance(source.getProject());
+                    highlightingSettingsPerFile.setHighlightingSettingForRoot(psiFile, FileHighlightingSetting.fromInspectionsLevel(InspectionsLevel.NONE));
+                }
+                return;
             }
         }
     }
