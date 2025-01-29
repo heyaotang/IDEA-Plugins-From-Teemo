@@ -24,9 +24,9 @@ public class MyFileEditorListener implements FileEditorManagerListener {
     @Override
     public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
         LOG.info("File opened: " + file.getPath());
-        var allFlags = Arrays.stream(this.properties.getValue(MyPluginConfigurable.NAME_HIGHLIGHT_ALL, "").split(",")).map(x -> x.toUpperCase(Locale.ROOT).trim()).collect(Collectors.toList());
-        var syntaxFlags = Arrays.stream(this.properties.getValue(MyPluginConfigurable.NAME_HIGHLIGHT_SYNTAX, "").split(",")).map(x -> x.toUpperCase(Locale.ROOT).trim()).collect(Collectors.toList());
-        var noneFlags = Arrays.stream(this.properties.getValue(MyPluginConfigurable.NAME_HIGHLIGHT_NONE, "").split(",")).map(x -> x.toUpperCase(Locale.ROOT).trim()).collect(Collectors.toList());
+        var allFlags = Arrays.stream(this.properties.getValue(MyPluginConstants.NAME_HIGHLIGHT_ALL, MyPluginConstants.DEFAULT_HIGHLIGHT_ALL).split(",")).map(x -> x.toUpperCase(Locale.ROOT).trim()).collect(Collectors.toList());
+        var syntaxFlags = Arrays.stream(this.properties.getValue(MyPluginConstants.NAME_HIGHLIGHT_SYNTAX, MyPluginConstants.DEFAULT_HIGHLIGHT_SYNTAX).split(",")).map(x -> x.toUpperCase(Locale.ROOT).trim()).collect(Collectors.toList());
+        var noneFlags = Arrays.stream(this.properties.getValue(MyPluginConstants.NAME_HIGHLIGHT_NONE, MyPluginConstants.DEFAULT_HIGHLIGHT_NONE).split(",")).map(x -> x.toUpperCase(Locale.ROOT).trim()).collect(Collectors.toList());
         //
         for (String allFlag : allFlags) {
             if (file.getName().toUpperCase(Locale.ROOT).endsWith(allFlag)) {
